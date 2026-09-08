@@ -24,8 +24,10 @@ dependencies:
   http: ^1.2.2
 
   # File / image picking
-  file_picker: ^8.1.2
-  image_picker: ^1.1.2
+  # Pinned to versions whose Android AAR metadata works with compileSdk 36
+  # (newer builds demand SDK 37+, which the stable toolchain doesn't ship yet).
+  file_picker: 8.1.2
+  image_picker: 1.1.2
 
   # PDF generation + printing/preview
   pdf: ^3.11.1
@@ -44,6 +46,17 @@ dependencies:
   supabase_flutter: ^2.8.0
 
   intl: ^0.19.0
+
+# Force stable plugin versions that build against compileSdk 36.
+# The newest releases require an Android SDK that the stable toolchain
+# doesn't ship yet, which breaks the CI APK build.
+dependency_overrides:
+  flutter_plugin_android_lifecycle: 2.0.24
+  image_picker_android: 0.8.12+18
+  file_picker: 8.1.2
+  path_provider_android: 2.2.15
+  shared_preferences_android: 2.3.4
+  url_launcher_android: 6.3.14
 
 dev_dependencies:
   flutter_test:
