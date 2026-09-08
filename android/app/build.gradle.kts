@@ -18,8 +18,8 @@ android {
 
     defaultConfig {
         applicationId = "com.clerkmate.clerkmate"
-        // file_picker / share_plus / printing need at least API 23.
-        minSdk = 23
+        // Recent plugins (lifecycle, file_picker) require at least API 24.
+        minSdk = 24
         targetSdk = 36
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
