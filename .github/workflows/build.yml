@@ -28,7 +28,11 @@ jobs:
         run: flutter pub get
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        # Gemini API key is injected from a GitHub Secret (never stored in code).
+        # If the secret is not set, the AI feature is simply hidden.
+        run: flutter build apk --debug --dart-define=GEMINI_API_KEY="${GEMINI_API_KEY}"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
