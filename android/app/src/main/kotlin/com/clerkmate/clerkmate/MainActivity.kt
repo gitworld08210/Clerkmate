@@ -1,0 +1,5 @@
+package com.clerkmate.clerkmate
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
