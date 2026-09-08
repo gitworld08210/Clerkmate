@@ -43,15 +43,28 @@ class _LoginScreenState extends State<LoginScreen> {
         await state.signIn(email, pass);
       }
     } catch (e) {
-      _msg('${s.loginFailed}: ${_clean(e)}');
+      _msg(_friendly(e, s));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
-  String _clean(Object e) {
-    final t = e.toString();
-    return t.replaceAll('AuthException(message: ', '').replaceAll(')', '');
+  /// Turns raw Supabase auth errors into short, readable messages.
+  String _friendly(Object e, s) {
+    final t = e.toString().toLowerCase();
+    if (t.contains('email_not_confirmed') || t.contains('not confirmed')) {
+      return s.errEmailNotConfirmed;
+    }
+    if (t.contains('invalid login') || t.contains('invalid_credentials')) {
+      return s.errInvalidCredentials;
+    }
+    if (t.contains('already registered') || t.contains('already been registered')) {
+      return s.errAlreadyRegistered;
+    }
+    // Fallback: strip the noisy wrapper text.
+    final raw = e.toString();
+    final match = RegExp(r'message:\s*([^,]+)').firstMatch(raw);
+    return '${s.loginFailed}: ${match?.group(1) ?? raw}';
   }
 
   void _msg(String m) {

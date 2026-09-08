@@ -146,6 +146,14 @@ class S {
       'Enter a valid email and a password of at least 6 characters.');
   String get loginFailed => _('Login nahi hua', 'Login failed');
   String get signUpDone => _(
-      'Account ban gaya! Ab login karein (email verify karna pad sakta hai).',
-      'Account created! Now log in (you may need to verify your email).');
+      'Account ban gaya! Ab login karein.',
+      'Account created! You can log in now.');
+  String get errEmailNotConfirmed => _(
+      'Email verify nahi hui. Admin se account activate karwayein ya thodi der baad try karein.',
+      'Email not confirmed yet. Ask the admin to activate your account, or try again shortly.');
+  String get errInvalidCredentials => _(
+      'Email ya password galat hai.', 'Wrong email or password.');
+  String get errAlreadyRegistered => _(
+      'Ye email pehle se registered hai. Login karein.',
+      'This email is already registered. Please log in.');
 }

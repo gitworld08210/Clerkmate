@@ -15,7 +15,7 @@ class AppState extends ChangeNotifier {
 
   List<Teacher> teachers = [];
   SchoolInfo school = SchoolInfo();
-  Lang lang = Lang.hi; // Hindi by default
+  Lang lang = Lang.en; // English by default
   bool loading = false;
   bool dataLoaded = false;
 
@@ -31,7 +31,8 @@ class AppState extends ChangeNotifier {
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
-    lang = prefs.getString(_kLang) == 'en' ? Lang.en : Lang.hi;
+    // Default to English; only use Hindi if the user explicitly chose it.
+    lang = prefs.getString(_kLang) == 'hi' ? Lang.hi : Lang.en;
     // React to login / logout automatically.
     _auth.onAuthStateChange.listen((event) {
       if (event.session != null) {
