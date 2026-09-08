@@ -101,13 +101,29 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.school, size: 64, color: Color(0xFF1565C0)),
-              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1565C0).withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.school,
+                    size: 56, color: Color(0xFF1565C0)),
+              ),
+              const SizedBox(height: 16),
               Text(s.appName,
                   style: const TextStyle(
-                      fontSize: 26, fontWeight: FontWeight.bold)),
+                      fontSize: 28, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(s.appTagline,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              const SizedBox(height: 8),
               Text(_isSignUp ? s.createAccount : s.loginTitle,
-                  style: const TextStyle(fontSize: 15)),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w600)),
               const SizedBox(height: 24),
               TextField(
                 controller: _email,

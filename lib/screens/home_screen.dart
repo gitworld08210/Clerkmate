@@ -14,66 +14,95 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final s = state.s;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(s.appName),
-        actions: [
-          // Language toggle: shows the language you can switch TO.
-          TextButton.icon(
-            icon: const Icon(Icons.translate, color: Colors.white),
-            label: Text(
-              state.lang.name == 'hi' ? 'EN' : 'हिं',
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () => context.read<AppState>().toggleLanguage(),
-          ),
-          IconButton(
-            tooltip: s.logout,
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<AppState>().signOut(),
-          ),
-        ],
-      ),
+      backgroundColor: cs.surfaceContainerLowest,
       body: state.loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _Header(schoolName: state.school.name, greeting: s.namaste,
-                    hint: s.setSchoolHint),
-                const SizedBox(height: 16),
-                _MenuCard(
-                  icon: Icons.receipt_long,
-                  color: Colors.green,
-                  title: s.makeSalaryBill,
-                  subtitle: s.makeSalaryBillSub,
-                  onTap: () => _open(context, const SalaryBillScreen()),
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar.large(
+                  title: const Text('ClerkMate'),
+                  actions: [
+                    TextButton.icon(
+                      icon: Icon(Icons.translate, color: cs.onPrimaryContainer),
+                      label: Text(
+                        state.lang.name == 'hi' ? 'EN' : 'हिं',
+                        style: TextStyle(
+                            color: cs.onPrimaryContainer,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () =>
+                          context.read<AppState>().toggleLanguage(),
+                    ),
+                    IconButton(
+                      tooltip: s.logout,
+                      icon: const Icon(Icons.logout),
+                      onPressed: () => context.read<AppState>().signOut(),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                 ),
-                if (state.aiEnabled)
-                  _MenuCard(
-                    icon: Icons.auto_fix_high,
-                    color: Colors.deepPurple,
-                    title: s.formAutoFill,
-                    subtitle: s.formAutoFillSub,
-                    onTap: () => _open(context, const FormFillScreen()),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: _SchoolBanner(
+                      title: state.school.name.isEmpty
+                          ? s.namaste
+                          : state.school.name,
+                      subtitle: state.school.name.isEmpty
+                          ? s.setSchoolHint
+                          : (state.school.district.isEmpty
+                              ? s.appTagline
+                              : state.school.district),
+                      email: state.userEmail,
+                    ),
                   ),
-                _MenuCard(
-                  icon: Icons.people,
-                  color: Colors.orange,
-                  title: s.teachers,
-                  subtitle: '${state.teachers.length} ${s.recordsSaved}',
-                  onTap: () => _open(context, const TeachersScreen()),
                 ),
-                _MenuCard(
-                  icon: Icons.school,
-                  color: Colors.blue,
-                  title: s.schoolDetails,
-                  subtitle: state.school.name.isEmpty
-                      ? s.notSetYet
-                      : state.school.name,
-                  onTap: () => _open(context, const SchoolScreen()),
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverGrid(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: 0.98,
+                    ),
+                    delegate: SliverChildListDelegate([
+                      _Tile(
+                        icon: Icons.receipt_long,
+                        color: const Color(0xFF2E7D32),
+                        title: s.makeSalaryBill,
+                        subtitle: s.makeSalaryBillSub,
+                        onTap: () => _open(context, const SalaryBillScreen()),
+                      ),
+                      _Tile(
+                        icon: Icons.description,
+                        color: const Color(0xFF6A1B9A),
+                        title: s.formAutoFill,
+                        subtitle: s.formAutoFillSub,
+                        onTap: () => _open(context, const FormFillScreen()),
+                      ),
+                      _Tile(
+                        icon: Icons.groups,
+                        color: const Color(0xFFEF6C00),
+                        title: s.teachers,
+                        subtitle: '${state.teachers.length} ${s.recordsSaved}',
+                        onTap: () => _open(context, const TeachersScreen()),
+                      ),
+                      _Tile(
+                        icon: Icons.apartment,
+                        color: const Color(0xFF1565C0),
+                        title: s.schoolDetails,
+                        subtitle: state.school.name.isEmpty
+                            ? s.notSetYet
+                            : state.school.name,
+                        onTap: () => _open(context, const SchoolScreen()),
+                      ),
+                    ]),
+                  ),
                 ),
               ],
             ),
@@ -85,52 +114,70 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  final String schoolName;
-  final String greeting;
-  final String hint;
-  const _Header(
-      {required this.schoolName, required this.greeting, required this.hint});
+class _SchoolBanner extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String email;
+  const _SchoolBanner(
+      {required this.title, required this.subtitle, required this.email});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            const Icon(Icons.waving_hand, size: 32),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(greeting,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text(
-                    schoolName.isEmpty ? hint : schoolName,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cs.primary, cs.primary.withValues(alpha: 0.75)],
         ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.white24,
+                child: const Icon(Icons.school, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(subtitle,
+              style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          if (email.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(email,
+                style: const TextStyle(color: Colors.white60, fontSize: 12)),
+          ],
+        ],
       ),
     );
   }
 }
 
-class _MenuCard extends StatelessWidget {
+class _Tile extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
-  const _MenuCard({
+  const _Tile({
     required this.icon,
     required this.color,
     required this.title,
@@ -140,21 +187,43 @@ class _MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          radius: 26,
-          backgroundColor: color.withValues(alpha: 0.15),
-          child: Icon(icon, color: color, size: 28),
-        ),
-        title: Text(title,
-            style:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(20),
+      elevation: 1,
+      shadowColor: Colors.black26,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
         onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const Spacer(),
+              Text(title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
